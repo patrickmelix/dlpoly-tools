@@ -53,6 +53,7 @@ def readSTATIS(statis='STATIS', path='./',chunkSize=1024):
             #if this is a line that ends with the number of points, go to the next step
             if l[-1] == str(metaInfo['nPoints']):
                 data.append([])
+                continue
 
             #save data
             data[-1].extend([float(x) for x in l])
