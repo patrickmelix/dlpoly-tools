@@ -22,7 +22,7 @@ def readSTATIS(statis='STATIS', path='./',chunkSize=1024):
         -metaInfo: Dictionary that contains the system name, energy units, number of steps, number of data points per step.
                    Contains keys: 'systemName', 'units', 'nSteps', 'nPoints'.
 
-        -data: The Energies from every step in the statis file are returned as a list inside a list.
+        -data: The Values from every step in the statis file are returned as a list inside a list.
                The information of the first step is therefore found in the 0th element of the returned list.
 
     """
