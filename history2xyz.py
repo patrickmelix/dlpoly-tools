@@ -6,10 +6,11 @@
 # 2017/07/08
 #
 # You can import the module and use the functions or call it as a script
+import os, sys, argparse
 
 
 
-def main():
+def main(inFile='HISTORY', outFile='traj.xyz', samePath=False, verbose=False):
     print('Welcome.')
     atomNames = {}
     atomNames['ca'] = 'C'
@@ -30,22 +31,30 @@ def main():
     atomNames['ha'] = 'H'
     atomNames['ho'] = 'H'
     atomNames['hn'] = 'H'
-    convertHistory2XYZ('HISTORY','traj.xyz',atomNames)
-    print('Done!')
-    
-def convertHistory2XYZ(inFile, outFile, atomNames):
+
+    if os.path.isdir(inFile):
+        inFile = os.path.join(inFile,'HISTORY')
+    if samePath:
+        outFile = os.path.join(os.path.split(inFile)[0],outFile)
+        print("Writing to {:}".format(outFile))
+
+    convertHistory2XYZ(inFile, outFile, atomNames, verbose)
+    if verbose: print('Done!')
+
+def convertHistory2XYZ(inFile, outFile, atomNames, verbose=False):
     bunchsize = 1000000     # Experiment with different sizes 1000000
     bunch = []
-    print('Processing...')
+    if verbose: print('Processing...')
     with open(inFile, "r", bunchsize) as r, open(outFile, "w", bunchsize) as w:
         #skip header line
         next(r)
         line = r.readline().strip().split()
         levcfg,imcon,nAtoms = [int(x) for x in line[0:3]]
-        print('levcfg: '+str(levcfg))
-        print('imcon: '+str(imcon))
-        print('nAtoms: '+str(nAtoms))
-        print('Frame: 0...', end='\r')
+        if verbose:
+            print('levcfg: '+str(levcfg))
+            print('imcon: '+str(imcon))
+            print('nAtoms: '+str(nAtoms))
+            print('Frame: 0...', end='\r')
         nItems = (levcfg+1)*3
         if imcon == 6:
             latticeBool = 'pbc="T T F"'
@@ -63,7 +72,7 @@ def convertHistory2XYZ(inFile, outFile, atomNames):
             if split[0].lower() == 'timestep':
                 bunch.append(str(nAtoms)+'\n')
                 iFrame += 1
-                print('Frame: '+str(iFrame)+'...', end='\r')
+                if verbose: print('Frame: '+str(iFrame)+'...', end='\r')
                 tmp = []
                 #timestep value
                 #tmp.append(split[0])
@@ -82,15 +91,22 @@ def convertHistory2XYZ(inFile, outFile, atomNames):
                     tmp.extend([float(x) for x in r.readline().strip().split()])
                 name = atomNames[split[0].lower()]
                 bunch.append(("{:4}"+("{:16f}")*nItems+'\n').format(name,*tmp))
-        
+
             if len(bunch) == bunchsize:
                 w.writelines(bunch)
                 iLine += bunchsize
                 bunch = []
         w.writelines(bunch)
-            
+
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='Convert HISTORY file to ASE extxyz')
+    parser.add_argument('-i', '--input', type=str, help='input file or folder', default='HISTORY')
+    parser.add_argument('-o', '--output', type=str, help='output file', default="traj.xyz")
+    parser.add_argument('--samepath', action='store_true', help='output file in same dir as input')
+    parser.add_argument('-v', '--verbose', action='store_true', help='print progress info')
+    args = parser.parse_args()
+
+    main(args.input, args.output, args.samepath, args.verbose)
 
 
