@@ -11,7 +11,8 @@ import os, sys, argparse
 
 
 def main(inFile='HISTORY', outFile='traj.xyz', samePath=False, verbose=False):
-    print('Welcome.')
+    if verbose:
+        print('Welcome.')
     atomNames = {}
     atomNames['ca'] = 'C'
     atomNames['cb'] = 'C'
