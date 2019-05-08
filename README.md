@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/107398845.svg)](https://zenodo.org/badge/latestdoi/107398845)
+
 # dlpoly-tools
 This Repository offers some of the codes that I use to handle DL_POLY Classic calculations. Feel free to contribute yours.
 
